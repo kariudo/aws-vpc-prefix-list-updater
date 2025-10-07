@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  prefix-list-monitor:
+    build: .
+    image: aws-vpc-prefix-list-monitor:latest
+    container_name: prefix-list-monitor
+    restart: unless-stopped
+
+    environment:
+      # Required
+      - PREFIX_LIST_ID=${PREFIX_LIST_ID}
+
+      # AWS Configuration
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-}
+
+      # Optional Configuration
+      - ENTRY_DESCRIPTION=${ENTRY_DESCRIPTION:-Auto-updated host IP}
+      - CHECK_INTERVAL=${CHECK_INTERVAL:-300}
+      - CIDR_SUFFIX=${CIDR_SUFFIX:-32}
+      - IP_SERVICE_URL=${IP_SERVICE_URL:-https://api.ipify.org}
+
+      # Logging
+      - RUST_LOG=${RUST_LOG:-info}
+
+    # Health check (runs once mode to verify connectivity)
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "/usr/local/bin/monitor",
+          "--once",
+          "--prefix-list-id",
+          "${PREFIX_LIST_ID}",
+        ]
+      interval: 5m
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+
+    # Resource limits (optional)
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
