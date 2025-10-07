@@ -7,7 +7,7 @@ use clap::Parser;
 use reqwest;
 use std::time::Duration;
 use tokio::time;
-use tracing::{info, warn, error, debug};
+use tracing::{info, error, debug};
 
 
 #[derive(Parser, Debug)]
