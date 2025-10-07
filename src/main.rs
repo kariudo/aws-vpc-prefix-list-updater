@@ -42,16 +42,35 @@ struct Args {
     once: bool,
 }
 
+/// A struct representing a prefix list monitor.
+///
+/// This struct is used to monitor an external IP and update AWS VPC prefix list accordingly.
 struct PrefixListMonitor {
+    /// The client instance used to interact with the AWS EC2 service.
     client: Client,
+    /// The ID of the prefix list being monitored.
     prefix_list_id: String,
+    /// The description of the prefix list entry.
     description: String,
+    /// The current external IP address.
     current_ip: Option<String>,
+    /// The CIDR suffix used to format the IP address.
     cidr_suffix: u8,
+    /// The URL of the IP service being used.
     ip_service: String,
 }
 
 impl PrefixListMonitor {
+    /// Creates a new instance of `PrefixListMonitor`.
+    ///
+    /// # Parameters
+    ///
+    /// * `client`: The client instance used to interact with the AWS EC2 service.
+    /// * `args`: The arguments passed to the program.
+    ///
+    /// # Returns
+    ///
+    /// A new instance of `PrefixListMonitor`.
     fn new(client: Client, args: &Args) -> Self {
         Self {
             client,
@@ -63,6 +82,11 @@ impl PrefixListMonitor {
         }
     }
 
+    /// Retrieves the external IP address from the specified IP service.
+    ///
+    /// # Returns
+    ///
+    /// The external IP address as a `String`, or an error if the request fails.
     async fn get_external_ip(&self) -> Result<String, Box<dyn std::error::Error>> {
         let response = reqwest::get(&self.ip_service)
             .await?
@@ -78,6 +102,11 @@ impl PrefixListMonitor {
         }
     }
 
+    /// Retrieves the version of the prefix list.
+    ///
+    /// # Returns
+    ///
+    /// The version of the prefix list as an `i64`, or an error if the request fails.
     async fn get_prefix_list_version(&self) -> Result<i64, Box<dyn std::error::Error>> {
         let response = self.client
             .describe_managed_prefix_lists()
@@ -93,6 +122,11 @@ impl PrefixListMonitor {
         Ok(prefix_list.version().unwrap_or(0))
     }
 
+    /// Retrieves the current entries from the prefix list.
+    ///
+    /// # Returns
+    ///
+    /// A vector of `String` representing the current entries in the prefix list, or an error if the request fails.
     async fn get_current_entries(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         let response = self.client
             .get_managed_prefix_list_entries()
@@ -115,6 +149,16 @@ impl PrefixListMonitor {
         Ok(entries)
     }
 
+    /// Updates the prefix list by adding or replacing entries.
+    ///
+    /// # Parameters
+    ///
+    /// * `new_cidr`: The new CIDR format of the IP address.
+    /// * `old_cidrs`: A vector of old CIDRs to be removed from the prefix list.
+    ///
+    /// # Returns
+    ///
+    /// An error if the request fails, or `Ok(())` on success.
     async fn update_prefix_list(&self, new_cidr: &str, old_cidrs: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
         let version = self.get_prefix_list_version().await?;
         
@@ -152,6 +196,12 @@ impl PrefixListMonitor {
         Ok(())
     }
 
+    /// Checks the IP address and updates the prefix list accordingly.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(true)` if the IP address has changed, or `Ok(false)` if it hasn't.
+    /// An error if the request fails.
     async fn check_and_update(&mut self) -> Result<bool, Box<dyn std::error::Error>> {
         // Get current external IP
         let external_ip = self.get_external_ip().await?;
@@ -195,6 +245,16 @@ impl PrefixListMonitor {
         Ok(true)
     }
 
+    /// Runs the program in a loop until stopped.
+    ///
+    /// # Parameters
+    ///
+    /// * `interval`: The check interval in seconds.
+    /// * `once`: Whether to run once and exit.
+    ///
+    /// # Returns
+    ///
+    /// An error if the request fails, or `Ok(())` on success.
     async fn run(&mut self, interval: Duration, once: bool) -> Result<(), Box<dyn std::error::Error>> {
         info!("Starting prefix list monitor");
         info!("Prefix List ID: {}", self.prefix_list_id);
