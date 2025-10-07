@@ -16,6 +16,11 @@ _Consider keeping me caffinated:_
 
 ## 🤔 Use Case
 
+I got really tired of having to go into the AWS console to whitelist my IP in a
+prefix list every time my power at home flickered causing my fiber gateway to
+give me a new IP address. So my solution... code! So I wrote this tool for myself
+but you should use it too!
+
 This tool is ideal when you need to:
 
 - Grant your home/office network access to AWS resources (RDS, EC2, etc.) with a dynamic IP
