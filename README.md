@@ -1,8 +1,20 @@
-# AWS VPC Prefix List IP Monitor
+<div align="center">
 
-A lightweight Rust daemon that monitors your external public IP address and automatically updates an AWS VPC managed prefix list entry. Perfect for maintaining access to AWS resources from dynamic IP addresses.
+# AWS VPC Prefix List Updater
 
-## Use Case
+[![Rust](https://img.shields.io/badge/Rust-1.78%2B-orange?logo=rust)](https://www.rust-lang.org/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+**AWS VPC Prefix List Updater** is a _🔥 blazingly-fast, 🧠 memory-safe, 🔋 batteries-included, 💺ergonomic, 🦀 100% Rust-powered_ daemon that monitors your external public IP address and automatically updates an AWS VPC managed prefix list entry. Perfect for maintaining access to AWS resources from dynamic IP addresses.
+
+_Consider keeping me caffinated:_
+
+[![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/kariudo)
+[![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/kariudo)
+
+</div>
+
+## 🤔 Use Case
 
 This tool is ideal when you need to:
 
@@ -11,7 +23,7 @@ This tool is ideal when you need to:
 - Run in a Docker container for easy deployment and management
 - Keep a prefix list entry up-to-date without manual intervention
 
-## Features
+## 🧺 Features
 
 - 🔄 **Automatic IP Monitoring**: Continuously checks external IP at configurable intervals
 - 🎯 **Smart Updates**: Only updates AWS when IP actually changes
@@ -21,7 +33,7 @@ This tool is ideal when you need to:
 - ⚡ **Lightweight**: Small binary (~10MB) with minimal memory footprint
 - 🔒 **IAM Role Support**: Works with instance profiles, credentials, or environment variables
 
-## Quick Start
+## 🏃🏻 Quick Start
 
 ### Using Docker Compose (Recommended)
 
@@ -73,7 +85,7 @@ cargo build --release
   --region us-east-1
 ```
 
-## Configuration
+## ⚙️ Configuration
 
 ### Environment Variables
 
@@ -106,7 +118,7 @@ Options:
   -V, --version                      Print version
 ```
 
-## How It Works
+## 💁🏻‍♂️ How It Works
 
 1. **IP Detection**: Queries an external service (default: ipify.org) to get current public IP
 2. **Change Detection**: Compares with previously known IP
@@ -116,7 +128,7 @@ Options:
 
 The tool only manages entries with the specific description you configure, leaving other entries untouched.
 
-## IAM Permissions
+## 🔑 IAM Permissions
 
 The AWS credentials must have these permissions:
 
@@ -143,7 +155,7 @@ For production, scope the `Resource` to specific prefix list ARNs:
 "Resource": "arn:aws:ec2:us-east-1:123456789012:prefix-list/pl-12345678"
 ```
 
-## Testing
+## 🧪 Testing
 
 Test without starting the daemon:
 
@@ -164,7 +176,7 @@ Or with source build:
 cargo run -- --prefix-list-id pl-12345678 --once
 ```
 
-## Monitoring
+## ✅ Monitoring
 
 ### Docker Logs
 
@@ -190,7 +202,7 @@ INFO  Successfully updated prefix list to version 2
 INFO  ✓ Prefix list updated successfully
 ```
 
-## Deployment Examples
+## 👍🏻 Deployment Examples
 
 ### AWS ECS with IAM Role
 
@@ -247,7 +259,7 @@ spec:
               value: "us-east-1"
 ```
 
-## Troubleshooting
+## 👷🏻 Troubleshooting
 
 ### Container won't start
 
@@ -268,7 +280,7 @@ spec:
 - The tool will retry on next interval
 - Consider increasing CHECK_INTERVAL if this happens frequently
 
-## Alternative IP Services
+## 👀 Alternative IP Services
 
 If ipify.org is unavailable, configure alternatives:
 
@@ -283,7 +295,7 @@ IP_SERVICE_URL=https://icanhazip.com
 IP_SERVICE_URL=https://checkip.amazonaws.com
 ```
 
-## Development
+## 🛠️ Development
 
 Run tests:
 
@@ -305,10 +317,21 @@ Build optimized binary:
 cargo build --release
 ```
 
-## License
+## 📜 License
 
-MIT License
+MIT License - see [LICENSE](LICENSE) for details.
 
-## Contributing
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/kariudo">kariudo</a> |
+  ☕ <a href="https://buymeacoffee.com/kariudo">Support the developer</a>
+</p>
 
-Issues and pull requests welcome!
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feat/amazing-feature`)
+5. Open a Pull Request
