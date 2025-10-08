@@ -7,8 +7,8 @@ use clap::Parser;
 use reqwest;
 use std::time::Duration;
 use tokio::time;
-use tracing::{info, error, debug};
-
+use tracing::{debug, error, info};
+use tracing_subscriber::EnvFilter;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Monitor external IP and update AWS VPC prefix list", long_about = None)]
@@ -22,7 +22,12 @@ struct Args {
     prefix_list_id: String,
 
     /// Description for the prefix list entry
-    #[arg(short, long, env = "ENTRY_DESCRIPTION", default_value = "Auto-updated host IP")]
+    #[arg(
+        short,
+        long,
+        env = "ENTRY_DESCRIPTION",
+        default_value = "Auto-updated host IP"
+    )]
     description: String,
 
     /// Check interval in seconds
@@ -88,12 +93,9 @@ impl PrefixListMonitor {
     ///
     /// The external IP address as a `String`, or an error if the request fails.
     async fn get_external_ip(&self) -> Result<String, Box<dyn std::error::Error>> {
-        let response = reqwest::get(&self.ip_service)
-            .await?
-            .text()
-            .await?;
+        let response = reqwest::get(&self.ip_service).await?.text().await?;
         let ip = response.trim().to_string();
-        
+
         // Basic IP validation
         if ip.parse::<std::net::Ipv4Addr>().is_ok() {
             Ok(ip)
@@ -108,7 +110,8 @@ impl PrefixListMonitor {
     ///
     /// The version of the prefix list as an `i64`, or an error if the request fails.
     async fn get_prefix_list_version(&self) -> Result<i64, Box<dyn std::error::Error>> {
-        let response = self.client
+        let response = self
+            .client
             .describe_managed_prefix_lists()
             .prefix_list_ids(&self.prefix_list_id)
             .send()
@@ -128,7 +131,8 @@ impl PrefixListMonitor {
     ///
     /// A vector of `String` representing the current entries in the prefix list, or an error if the request fails.
     async fn get_current_entries(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-        let response = self.client
+        let response = self
+            .client
             .get_managed_prefix_list_entries()
             .prefix_list_id(&self.prefix_list_id)
             .send()
@@ -159,10 +163,15 @@ impl PrefixListMonitor {
     /// # Returns
     ///
     /// An error if the request fails, or `Ok(())` on success.
-    async fn update_prefix_list(&self, new_cidr: &str, old_cidrs: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
+    async fn update_prefix_list(
+        &self,
+        new_cidr: &str,
+        old_cidrs: Vec<String>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let version = self.get_prefix_list_version().await?;
-        
-        let mut modify_request = self.client
+
+        let mut modify_request = self
+            .client
             .modify_managed_prefix_list()
             .prefix_list_id(&self.prefix_list_id)
             .current_version(version);
@@ -170,9 +179,7 @@ impl PrefixListMonitor {
         // Remove old entries with matching description
         for old_cidr in &old_cidrs {
             debug!("Removing old entry: {}", old_cidr);
-            let entry = RemovePrefixListEntry::builder()
-                .cidr(old_cidr)
-                .build();
+            let entry = RemovePrefixListEntry::builder().cidr(old_cidr).build();
             modify_request = modify_request.remove_entries(entry);
         }
 
@@ -217,9 +224,11 @@ impl PrefixListMonitor {
             }
         }
 
-        info!("IP change detected: {} -> {}", 
-              self.current_ip.as_deref().unwrap_or("none"), 
-              external_ip);
+        info!(
+            "IP change detected: {} -> {}",
+            self.current_ip.as_deref().unwrap_or("none"),
+            external_ip
+        );
 
         // Get current entries from prefix list with our description
         let current_entries = self.get_current_entries().await?;
@@ -233,8 +242,11 @@ impl PrefixListMonitor {
 
         // Update prefix list
         if !current_entries.is_empty() {
-            info!("Replacing {} old entries with new CIDR {}", 
-                  current_entries.len(), new_cidr);
+            info!(
+                "Replacing {} old entries with new CIDR {}",
+                current_entries.len(),
+                new_cidr
+            );
         } else {
             info!("Adding new CIDR {} to prefix list", new_cidr);
         }
@@ -255,7 +267,11 @@ impl PrefixListMonitor {
     /// # Returns
     ///
     /// An error if the request fails, or `Ok(())` on success.
-    async fn run(&mut self, interval: Duration, once: bool) -> Result<(), Box<dyn std::error::Error>> {
+    async fn run(
+        &mut self,
+        interval: Duration,
+        once: bool,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         info!("Starting prefix list monitor");
         info!("Prefix List ID: {}", self.prefix_list_id);
         info!("Description: {}", self.description);
@@ -290,10 +306,7 @@ impl PrefixListMonitor {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize tracing
     tracing_subscriber::fmt()
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::from_default_env()
-                .add_directive(tracing::Level::INFO.into())
-        )
+        .with_env_filter(EnvFilter::from_default_env())
         .init();
 
     let args = Args::parse();
@@ -313,7 +326,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let once = args.once;
 
     let mut monitor = PrefixListMonitor::new(client, &args);
-    
+
     monitor.run(interval, once).await?;
 
     Ok(())
