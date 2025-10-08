@@ -2,6 +2,12 @@
 name = "aws-vpc-prefix-list-monitor"
 version = "0.1.0"
 edition = "2021"
+authors = ["Hunter Horsman <kariudo@gmail.com>"]
+description = "A tool to monitor and update AWS VPC Prefix Lists based on external IP ranges."
+license = "MIT"
+repository = "https://github.com/kariudo/aws-vpc-prefix-list-updater"
+homepage = "https://github.com/kariudo/aws-vpc-prefix-list-updater"
+rust-version = "1.83.0"
 
 [dependencies]
 aws-config = { version = "1.5", features = ["behavior-version-latest"] }
