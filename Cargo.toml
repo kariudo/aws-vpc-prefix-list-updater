@@ -1,6 +1,6 @@
 [package]
 name = "aws-vpc-prefix-list-monitor"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Hunter Horsman <kariudo@gmail.com>"]
 description = "A tool to monitor your external public IP address and automatically updates an AWS VPC managed prefix list entry. Perfect for maintaining access to AWS resources from dynamic IP addresses."
