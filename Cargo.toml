@@ -1,13 +1,13 @@
 [package]
 name = "aws-vpc-prefix-list-monitor"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Hunter Horsman <kariudo@gmail.com>"]
 description = "A tool to monitor your external public IP address and automatically updates an AWS VPC managed prefix list entry. Perfect for maintaining access to AWS resources from dynamic IP addresses."
 license = "MIT"
 repository = "https://github.com/kariudo/aws-vpc-prefix-list-updater"
 homepage = "https://github.com/kariudo/aws-vpc-prefix-list-updater"
-rust-version = "1.83.0"
+rust-version = "1.86.0"
 
 [dependencies]
 aws-config = { version = "1.5", features = ["behavior-version-latest"] }

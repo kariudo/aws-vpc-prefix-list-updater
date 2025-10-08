@@ -2,7 +2,7 @@
 
 # AWS VPC Prefix List Updater
 
-[![Rust](https://img.shields.io/badge/Rust-1.83%2B-orange?logo=rust)](https://www.rust-lang.org/)
+[![Rust](https://img.shields.io/badge/Rust-1.86%2B-orange?logo=rust)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **AWS VPC Prefix List Updater** is a _🔥 blazingly-fast, 🧠 memory-safe, 🔋 batteries-included, 💺ergonomic, 🦀 100% Rust-powered_ daemon that monitors your external public IP address and automatically updates an AWS VPC managed prefix list entry. Perfect for maintaining access to AWS resources from dynamic IP addresses.
