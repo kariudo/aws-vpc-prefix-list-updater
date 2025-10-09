@@ -326,11 +326,6 @@ cargo build --release
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/kariudo">kariudo</a> |
-  ☕ <a href="https://buymeacoffee.com/kariudo">Support the developer</a>
-</p>
-
 ## 🤝 Contributing
 
 We welcome contributions! Please follow these steps:
@@ -340,3 +335,8 @@ We welcome contributions! Please follow these steps:
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feat/amazing-feature`)
 5. Open a Pull Request
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/kariudo">kariudo</a> |
+  ☕ <a href="https://buymeacoffee.com/kariudo">Support the developer</a>
+</p>
