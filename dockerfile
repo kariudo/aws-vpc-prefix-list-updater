@@ -1,6 +1,5 @@
-# Build stage
-FROM rust:1.90-slim AS builder
-
+# Chef planner stage
+FROM lukemathwalker/cargo-chef:latest-rust-1.90.0 AS chef
 WORKDIR /app
 
 # Install OpenSSL development package
@@ -8,24 +7,24 @@ RUN apt-get update && \
     apt-get install -y pkg-config libssl-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy manifests
-COPY Cargo.toml Cargo.lock ./
+# Create recipe.json
+FROM chef AS planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
-# Create a dummy main.rs to cache dependencies
-RUN mkdir src && \
-    echo "fn main() {}" > src/main.rs && \
-    cargo build --release && \
-    rm -rf src
+# Builder stage
+FROM chef AS builder
+COPY --from=planner /app/recipe.json recipe.json
 
-# Copy source code
-COPY src ./src
+# Build dependencies
+RUN cargo chef cook --release --recipe-path recipe.json
 
-# Build the actual binary
-RUN touch src/main.rs && \
-    cargo build --release
+# Build application
+COPY . .
+RUN cargo build --release
 
 # Runtime stage
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 # Install CA certificates and OpenSSL
 RUN apt-get update && \
