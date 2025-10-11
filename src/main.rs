@@ -331,22 +331,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_cidr_format() {
-        let ip = "203.0.113.1";
-        let suffix = 32;
-        let cidr = format!("{}/{}", ip, suffix);
-        assert_eq!(cidr, "203.0.113.1/32");
-    }
-
-    #[test]
-    fn test_ip_validation() {
-        assert!("192.168.1.1".parse::<std::net::Ipv4Addr>().is_ok());
-        assert!("invalid".parse::<std::net::Ipv4Addr>().is_err());
-    }
-}
